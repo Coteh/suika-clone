@@ -1,0 +1,212 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Suika Clone</title>
+        <meta name="theme-color" content="#000" />
+        <meta name="description" content="A clone of the popular Suika game" />
+        <meta name="robots" content="index, follow" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+        />
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="index.css" />
+        <link href="https://coteh.github.io/suika-clone" rel="canonical" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+        <link rel="manifest" href="manifest.json" />
+        <link rel="apple-touch-icon" href="icon152.png" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.5/mobile-detect.min.js"></script>
+        <script src="https://unpkg.com/feather-icons"></script>
+        <!-- Sentry -->
+        <script
+            src="https://js.sentry-cdn.com/b745a6ffab9d78d1c25d12870f22750e.min.js"
+            crossorigin="anonymous"
+        ></script>
+        <!-- Google tag (gtag.js) -->
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-DQ0FX7JR9K"
+        ></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'G-DQ0FX7JR9K');
+        </script>
+    </head>
+    <body>
+        <div class="game-wrapper">
+            <nav id="top" class="top-menu">
+                <span class="space"></span>
+                <span class="title">
+                    Suika Clone
+                </span>
+                <span class="space"></span>
+                <div class="icon-bar">
+                    <a class="help-link link-icon" href="#">
+                        <i data-feather="help-circle"></i>
+                    </a>
+                    <a class="settings-link link-icon" href="#">
+                        <i data-feather="settings"></i>
+                    </a>
+                </div>
+            </nav>
+            <div class="game pane">
+                <div id="content"></div>
+                <noscript>
+                    <div class="pane-overlay">
+                        <h3>Please enable JavaScript to play this game.</h3>
+                    </div>
+                </noscript>
+            </div>
+            <div class="settings pane" style="display: none;">
+                <h1>Settings</h1>
+                <button class="close"><i data-feather="x"></i></button>
+                <div class="space"></div>
+                <div class="settings-item-group">
+                    <div class="settings-item setting theme-switch">
+                        <div class="settings-item-column">
+                            <span>Theme</span>
+                        </div>
+                        <div class="settings-item-column">
+                            <span class="toggle">Suika</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="space"></span>
+                <div class="settings-item-group">
+                    <div class="settings-item">
+                        <span class="version-number">v0.0.1</span>
+                    </div>
+                </div>
+                <div class="space"></div>
+                <div class="footer">
+                    <span>
+                        &copy 2023
+                        <a
+                            class="author-link"
+                            href="https://www.jamescote.ca/"
+                            target="_blank"
+                            >James Cote</a
+                        > </span
+                    ><br />
+                    <span class="credits">
+                        <a
+                            href="https://www.flaticon.com/free-icons/finger"
+                            title="finger icons"
+                            target="_blank"
+                            >Finger icon created by Freepik - Flaticon</a
+                        >
+                    </span>
+                    <!-- <span class="snow-theme credits">
+                        Snow effect from
+                        <a href="https://embed.im/snow/" target="_blank"
+                            >embed.im</a
+                        >
+                    </span> -->
+                </div>
+                <div class="space"></div>
+            </div>
+        </div>
+        <div class="notification-area"></div>
+        <div class="overlay-back"></div>
+        <div id="landscape-overlay" style="display: none;">
+            <div class="overlay-content">
+                <p>
+                    Please rotate your device to portrait mode to play the game.
+                </p>
+                <img src="assets/img/rotate-device.png" alt="Rotate device" />
+            </div>
+        </div>
+        <template id="dialog">
+            <div class="dialog">
+                <button class="close"><i data-feather="x"></i></button>
+                <div class="dialog-content"></div>
+            </div>
+        </template>
+        <template id="notification">
+            <div class="notification">
+                <div class="notification-content">
+                    <span class="notification-message"></span>
+                </div>
+            </div>
+        </template>
+        <template id="how-to-play">
+            <span class="how-to-play">
+                <h2>How to play</h2>
+                <span class="text"
+                    >Merge fruits in order to obtain the watermelon.</span
+                >
+                <hr />
+                <br />
+                <div class="meaning">
+                    <span class="text"
+                        >Hierarchy goes Apple -> Pear -> Grapes -> Orange ->
+                        Lemon -> Mango -> Melon -> Watermelon.</span
+                    >
+                </div>
+                <br />
+                <span class="text">Good luck!</span>
+            </span>
+        </template>
+        <template id="error-dialog-content">
+            <span>
+                The following error occurred:
+            </span>
+            <span class="error-text"></span>
+            <span>
+                Please refresh the page and try again later.<br />
+                If this persists, please reach out to me on
+                <a
+                    href="https://github.com/Coteh/suika-clone/issues/new?assignees=&labels=&template=bug_report.md"
+                    target="_blank"
+                    >GitHub</a
+                >
+                or
+                <a href="mailto:james.cote.730@gmail.com" target="_blank"
+                    >email</a
+                >
+                with more information and I'll take a look.
+            </span>
+        </template>
+        <script src="bundle.js"></script>
+        <script>
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            } else {
+                document.querySelector(
+                    "[data-feather='help-circle']"
+                ).innerText = '?';
+                document.querySelector("[data-feather='settings']").innerText =
+                    '⚙';
+                document.querySelector(
+                    ".settings [data-feather='x']"
+                ).innerText = 'X';
+            }
+
+            if (typeof Sentry !== 'undefined') {
+                Sentry.onLoad(() => {
+                    Sentry.init({
+                        release: 'suika-clone@0.0.1',
+                        beforeSend(event) {
+                            if (
+                                event.request.url.includes('localhost') ||
+                                event.request.url.includes('127.0.0.1')
+                            ) {
+                                return null;
+                            }
+                            return event;
+                        },
+                    });
+                });
+            }
+
+            gtag('event', 'game_open', {
+                version: '0.0.1',
+            });
+        </script>
+    </body>
+</html>
