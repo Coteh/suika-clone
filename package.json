@@ -1,0 +1,32 @@
+{
+    "name": "suika-clone",
+    "version": "0.0.1",
+    "description": "Clone of Suika Game made in Phaser 3 and TypeScript",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Coteh/suika-clone.git"
+    },
+    "private": true,
+    "license": "MIT",
+    "author": "James Cote (Coteh)",
+    "main": "src/game.ts",
+    "scripts": {
+        "dev": "webpack-dev-server --env.NODE_ENV=dev",
+        "format": "prettier --config ./.prettierrc.json --write .",
+        "build": "webpack --mode=production",
+        "bump": "./scripts/bump.sh"
+    },
+    "dependencies": {
+        "phaser": "^3.60.0"
+    },
+    "devDependencies": {
+        "clean-webpack-plugin": "^4.0.0",
+        "copy-webpack-plugin": "^5.1.2",
+        "prettier": "2.0.5",
+        "ts-loader": "6.0.4",
+        "typescript": "3.9.5",
+        "webpack": "4.35.2",
+        "webpack-cli": "3.3.5",
+        "webpack-dev-server": "^3.11.0"
+    }
+}
