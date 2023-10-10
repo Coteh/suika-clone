@@ -83,7 +83,6 @@ export class MainScene extends Phaser.Scene {
             this.gameManager.setGameOver(false);
             this.gameManager.setDidWin(false);
         });
-        this.events.on('tap', () => {});
 
         this.fruits = this.physics.add.group({
             quantity: 0,
@@ -96,11 +95,6 @@ export class MainScene extends Phaser.Scene {
         });
 
         this.fruits.maxSize = -1;
-
-        Phaser.Actions.RandomRectangle(
-            this.fruits.getChildren(),
-            this.physics.world.bounds
-        );
 
         this.physics.add.collider(
             this.fruits,

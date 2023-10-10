@@ -402,9 +402,14 @@ a {
 }
 
 /* Footer */
+
 .footer {
     display: flex;
     flex-direction: column;
+}
+
+body .footer a.author-link {
+    text-decoration: none;
 }
 
 body .footer > .credits {
@@ -425,8 +430,4 @@ body .footer > .snow-theme.credits {
 body.snow .footer > .snow-theme.credits {
     opacity: 1;
     pointer-events: initial;
-}
-
-body .footer a.author-link {
-    text-decoration: none;
 }
