@@ -226,6 +226,10 @@ button.close {
     pointer-events: none;
 }
 
+.settings .settings-item > a {
+    text-decoration: none;
+}
+
 .settings .settings-item .settings-item-column {
     width: 100%;
     display: flex;
@@ -429,5 +433,9 @@ body .footer > .snow-theme.credits {
 
 body.snow .footer > .snow-theme.credits {
     opacity: 1;
+    pointer-events: initial;
+}
+
+body a > .version-number {
     pointer-events: initial;
 }
