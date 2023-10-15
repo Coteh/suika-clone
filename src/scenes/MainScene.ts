@@ -22,6 +22,9 @@ export class MainScene extends Phaser.Scene {
     private nextFruitSprite: Phaser.GameObjects.Sprite;
     private highestFruit: FruitType;
 
+    private bar: Phaser.GameObjects.Image;
+    private barTween: Phaser.Tweens.Tween;
+
     constructor() {
         super({
             key: 'MainScene',
@@ -137,6 +140,8 @@ export class MainScene extends Phaser.Scene {
         );
         barObj.setScale(5, 1);
         this.add.existing(barObj);
+        this.bar = barObj;
+        this.bar.alpha = 0;
 
         // Enable input for the scene
         this.input.on('pointerup', (pointer) => {
@@ -199,8 +204,16 @@ export class MainScene extends Phaser.Scene {
             this.fruits.children.entries.forEach((entry) => {
                 const sprite = entry as Fruit;
                 sprite.update(time, delta);
-                if (sprite.lifetime > 1000 && sprite.y < 100) {
-                    this.events.emit('gameOver');
+                if (sprite.lifetime > 1000) {
+                    if (sprite.y < 100) {
+                        this.events.emit('gameOver');
+                        if (this.barTween) {
+                            this.barTween.setFinishedState();
+                            this.bar.alpha = 0;
+                        }
+                    } else if (sprite.y < 250) {
+                        this.pulsateImage(this.bar);
+                    }
                 }
             });
         }
@@ -215,5 +228,24 @@ export class MainScene extends Phaser.Scene {
         if (debugKey && this.input.keyboard.checkDown(debugKey, 1000)) {
             this.events.emit('debugToggle');
         }
+    }
+
+    pulsateImage(pulsatingImage) {
+        // If a pulsating effect is active currently, then do not make a new one until it finishes
+        if (this.barTween && !this.barTween.isFinished()) {
+            return;
+        }
+
+        // Create a tween for the pulsating effect
+        this.barTween = this.tweens.add({
+            targets: pulsatingImage,
+            alpha: 1,
+            duration: 500, // Total duration of the pulsating effect in milliseconds
+            yoyo: true, // Yoyo makes the tween play back and forth
+            repeat: 1, // Repeat only once
+            onComplete: () => {
+                this.barTween.setFinishedState();
+            },
+        });
     }
 }
