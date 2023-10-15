@@ -226,6 +226,10 @@ button.close {
     pointer-events: none;
 }
 
+.settings .settings-item > a {
+    text-decoration: none;
+}
+
 .settings .settings-item .settings-item-column {
     width: 100%;
     display: flex;
@@ -402,9 +406,14 @@ a {
 }
 
 /* Footer */
+
 .footer {
     display: flex;
     flex-direction: column;
+}
+
+body .footer a.author-link {
+    text-decoration: none;
 }
 
 body .footer > .credits {
@@ -427,6 +436,6 @@ body.snow .footer > .snow-theme.credits {
     pointer-events: initial;
 }
 
-body .footer a.author-link {
-    text-decoration: none;
+body a > .version-number {
+    pointer-events: initial;
 }
