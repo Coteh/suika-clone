@@ -7,6 +7,7 @@ import {
     renderDialog,
     renderNotification,
 } from './page';
+import { hasPlayedBefore, setPlayedBefore } from './storage';
 
 const THEME_SETTING_NAME = 'theme-switch';
 
@@ -101,6 +102,38 @@ settings.forEach((setting) => {
     });
 });
 
+const closeDialog = (dialog, overlayBackElem) => {
+    if (dialog) {
+        // Check if dialog is closable first before closing (close button would be visible, if so)
+        const closeBtn = dialog.querySelector('button.close');
+        if (closeBtn.style.display === 'none') {
+            return;
+        }
+        dialog.remove();
+    }
+    // NTS: Perhaps it'd make more sense if overlay backdrop only disappeared when a valid dialog is passed,
+    // but if an invalid dialog is being passed, it might not be on the screen either.
+    // In this case, it may be better to leave this as-is and always have the backdrop close so that players can still play.
+    overlayBackElem.style.display = 'none';
+};
+
+const handleKeyInput = (key) => {
+    const dialog = document.querySelector('.dialog');
+    if (dialog && (key === 'enter' || key === 'escape')) {
+        return closeDialog(dialog, overlayBackElem);
+    }
+};
+
+window.addEventListener('keydown', (e) => {
+    handleKeyInput(e.key.toLowerCase());
+});
+
+const overlayBackElem = document.querySelector('.overlay-back');
+overlayBackElem.addEventListener('click', (e) => {
+    const dialog = document.querySelector('.dialog');
+    closeDialog(dialog, overlayBackElem);
+});
+
 const landscapeQuery = window.matchMedia('(orientation: landscape)');
 
 const checkForOrientation = (mediaQueryEvent) => {
@@ -130,3 +163,8 @@ if (landscapeQuery.addEventListener) {
 }
 
 checkForOrientation(landscapeQuery);
+
+if (!hasPlayedBefore()) {
+    renderDialog(createDialogContentFromTemplate('#how-to-play'), true);
+    setPlayedBefore();
+}
