@@ -168,7 +168,7 @@ export class MainScene extends Phaser.Scene {
         this.nextFruitSprite = new Phaser.GameObjects.Sprite(
             this,
             (game.config.width as number) - 40,
-            40,
+            100,
             'apple'
         );
         this.nextFruitSprite.setVisible(false);

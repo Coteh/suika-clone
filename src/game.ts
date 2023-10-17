@@ -33,7 +33,7 @@ if (process.env.IS_DEBUG) {
 window.onload = () => {
     const config: Phaser.Types.Core.GameConfig = {
         title: 'Suika Clone',
-        width: 400,
+        width: 460,
         height: 800,
         scene: scenes,
         type: Phaser.AUTO,
@@ -80,12 +80,6 @@ const toggleSettings = () => {
 };
 
 settingsLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    toggleSettings();
-});
-
-const settingsClose = settingsPane.querySelector('.close');
-settingsClose.addEventListener('click', (e) => {
     e.preventDefault();
     toggleSettings();
 });
