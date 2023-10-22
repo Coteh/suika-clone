@@ -51,7 +51,13 @@ module.exports = (env) => {
             }),
             new CopyWebpackPlugin({
                 patterns: [
-                    { from: 'assets/img/**', to: '.' },
+                    {
+                        from: 'assets/img/**',
+                        to: '.',
+                        globOptions: {
+                            ignore: ['**/*.xcf'],
+                        },
+                    },
                     { from: 'index.html', to: '.' },
                     { from: 'index.css', to: '.' },
                     { from: 'favicon.ico', to: '.' },
