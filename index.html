@@ -37,23 +37,20 @@
             gtag('config', 'G-DQ0FX7JR9K');
         </script>
     </head>
-    <body>
+    <body class="light">
         <div class="game-wrapper">
-            <nav id="top" class="top-menu">
-                <span class="space"></span>
-                <span class="title">
-                    Suika Clone
-                </span>
-                <span class="space"></span>
-                <div class="icon-bar">
-                    <a class="help-link link-icon" href="#">
-                        <i data-feather="help-circle"></i>
-                    </a>
-                    <a class="settings-link link-icon" href="#">
-                        <i data-feather="settings"></i>
-                    </a>
-                </div>
-            </nav>
+            <div class="top-menu-wrapper">
+                <nav id="top" class="top-menu">
+                    <div class="icon-bar">
+                        <a class="help-link link-icon" href="#">
+                            <i data-feather="help-circle"></i>
+                        </a>
+                        <a class="settings-link link-icon" href="#">
+                            <i data-feather="settings"></i>
+                        </a>
+                    </div>
+                </nav>
+            </div>
             <div class="game pane">
                 <div id="content"></div>
                 <noscript>
@@ -63,8 +60,8 @@
                 </noscript>
             </div>
             <div class="settings pane" style="display: none;">
+                <div class="top-space"></div>
                 <h1>Settings</h1>
-                <button class="close"><i data-feather="x"></i></button>
                 <div class="space"></div>
                 <div class="settings-item-group">
                     <div class="settings-item setting theme-switch">
@@ -83,7 +80,7 @@
                             href="https://github.com/Coteh/suika-clone/releases"
                             target="_blank"
                         >
-                            <span class="version-number">v0.0.2</span>
+                            <span class="version-number">v0.0.3</span>
                         </a>
                     </div>
                 </div>
@@ -154,6 +151,10 @@
                     >
                 </div>
                 <br />
+                <div class="meaning">
+                    <img src="/assets/img/themes/fruit_basket/Hierarchy.png" />
+                </div>
+                <br />
                 <span class="text">Good luck!</span>
             </span>
         </template>
@@ -195,7 +196,7 @@
             if (typeof Sentry !== 'undefined') {
                 Sentry.onLoad(() => {
                     Sentry.init({
-                        release: 'suika-clone@0.0.2',
+                        release: 'suika-clone@0.0.3',
                         beforeSend(event) {
                             if (
                                 event.request.url.includes('localhost') ||
@@ -210,7 +211,7 @@
             }
 
             gtag('event', 'game_open', {
-                version: '0.0.2',
+                version: '0.0.3',
             });
         </script>
     </body>
