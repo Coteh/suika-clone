@@ -7,16 +7,26 @@ import {
     renderDialog,
     renderNotification,
 } from './page';
-import { hasPlayedBefore, setPlayedBefore } from './storage';
+import {
+    GameOptions,
+    hasPlayedBefore,
+    loadGameOptions,
+    saveGameOptions,
+    setPlayedBefore,
+} from './storage';
 
 const THEME_SETTING_NAME = 'theme-switch';
+const CONTROLS_SETTING_NAME = 'controls';
 
 const LANDSCAPE_CLASS_NAME = 'landscape';
 
 declare global {
     var game: SuikaCloneGame;
     var MobileDetect: any;
+    var gameOptions: GameOptions;
 }
+
+global.gameOptions = loadGameOptions();
 
 class SuikaCloneGame extends Phaser.Game {
     constructor(config: Phaser.Types.Core.GameConfig) {
@@ -39,6 +49,10 @@ window.onload = () => {
         type: Phaser.AUTO,
         parent: 'content',
         backgroundColor: '#ffd59d',
+        input: {
+            // There needs to be at least 3 active pointers for multi-touch to work
+            activePointers: 3,
+        },
         scale: {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -86,14 +100,26 @@ settingsLink.addEventListener('click', (e) => {
 
 const settings = document.querySelectorAll('.setting');
 settings.forEach((setting) => {
+    const elem = setting as HTMLDivElement;
+    const toggle = setting.querySelector('.toggle');
     setting.addEventListener('click', (e) => {
-        const elem = e.target as HTMLDivElement;
-        const toggle = setting.querySelector('.toggle');
-        let enabled = false;
+        let optionChanged = false;
         if (elem.classList.contains(THEME_SETTING_NAME)) {
             renderNotification('Coming soon');
+        } else if (elem.classList.contains(CONTROLS_SETTING_NAME)) {
+            gameOptions.controls =
+                gameOptions.controls === 'tap' ? 'move' : 'tap';
+            game.events.emit('controlsChange', gameOptions.controls);
+            toggle.innerHTML = gameOptions.controls === 'move' ? 'Move' : 'Tap';
+            optionChanged = true;
+        }
+        if (optionChanged) {
+            saveGameOptions(gameOptions);
         }
     });
+    if (elem.classList.contains(CONTROLS_SETTING_NAME)) {
+        toggle.innerHTML = gameOptions.controls === 'move' ? 'Move' : 'Tap';
+    }
 });
 
 const closeDialog = (dialog, overlayBackElem) => {

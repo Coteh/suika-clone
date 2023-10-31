@@ -13,6 +13,13 @@ export class DebugScene extends Phaser.Scene {
         var game: Phaser.Scene = this.scene.get('MainScene');
         this.debugManager = new DebugManager(this);
         this.debugManager.addKey('highscore');
+        this.debugManager.addKey('xspeed');
+        this.debugManager.addKey('yspeed');
+        this.debugManager.addKey('x');
+        this.debugManager.addKey('y');
+        this.debugManager.addKey('moveLeftHeld');
+        this.debugManager.addKey('moveRightHeld');
+        this.debugManager.addKey('heldDelta');
         game.events.on('debug', (key, value) => {
             this.debugManager.setText(key, value);
         });

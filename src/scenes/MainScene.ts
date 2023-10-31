@@ -3,7 +3,9 @@ import {
     FruitType,
     fruitTypeToTextureString,
 } from '../gameobjects/Fruit';
+import { Player } from '../gameobjects/Player';
 import { GameManager } from '../managers/GameManager';
+import { GameControl } from '../types';
 
 export class MainScene extends Phaser.Scene {
     private gameManager: GameManager;
@@ -24,6 +26,10 @@ export class MainScene extends Phaser.Scene {
 
     private bar: Phaser.GameObjects.Image;
     private barTween: Phaser.Tweens.Tween;
+
+    private player: Player;
+
+    private controls: GameControl;
 
     constructor() {
         super({
@@ -50,7 +56,7 @@ export class MainScene extends Phaser.Scene {
             './assets/img/themes/fruit_basket/Watermelon.png'
         );
         this.load.image('bar', './assets/img/healthbar.png');
-        this.load.image('fingerIcon', './assets/img/tap.png');
+        this.load.image('player', './assets/img/Player.png');
         this.keys = new Map([
             ['LEFT', this.input.keyboard.addKey('LEFT')],
             ['RIGHT', this.input.keyboard.addKey('RIGHT')],
@@ -63,7 +69,9 @@ export class MainScene extends Phaser.Scene {
 
     create(): void {
         this.scene.launch('HUDScene');
-        this.scene.launch('DebugScene');
+        if (process.env.IS_DEBUG) {
+            this.scene.launch('DebugScene');
+        }
 
         this.gameManager = this.registry.get('gameManager');
         if (!this.gameManager) {
@@ -86,6 +94,45 @@ export class MainScene extends Phaser.Scene {
             this.gameManager.setGameOver(false);
             this.gameManager.setDidWin(false);
         });
+        this.events.on('moveLeft', () => {
+            this.player.moveLeft();
+        });
+        this.events.on('moveLeftStart', () => {
+            this.player.moveLeftStart();
+            this.events.emit('debug', 'moveLeftHeld', true);
+        });
+        this.events.on('moveLeftStop', () => {
+            this.player.moveLeftStop();
+            this.events.emit('debug', 'moveLeftHeld', false);
+        });
+        this.events.on('moveRight', () => {
+            this.player.moveRight();
+        });
+        this.events.on('moveRightStart', () => {
+            this.player.moveRightStart();
+            this.events.emit('debug', 'moveRightHeld', true);
+        });
+        this.events.on('moveRightStop', () => {
+            this.player.moveRightStop();
+            this.events.emit('debug', 'moveRightHeld', false);
+        });
+        this.events.on('dropFruit', (posX) => {
+            if (!this.hasTouched || this.gameManager.isGameOver()) {
+                this.events.emit('gameStarted');
+                this.hasTouched = true;
+            }
+            this.events.emit('tap');
+            // Place fruit
+            if (this.canTouch) {
+                const fruit = new Fruit(this, posX, 20, this.nextFruit);
+                this.fruits.add(fruit, true);
+                fruit.body.velocity.add(new Phaser.Math.Vector2(0, 500));
+                this.touchCooldown = 500;
+                this.canTouch = false;
+                this.setNextFruit();
+            }
+        });
+        this.game.events.on('controlsChange', this.onControlsChange.bind(this));
 
         this.fruits = this.physics.add.group({
             quantity: 0,
@@ -149,20 +196,10 @@ export class MainScene extends Phaser.Scene {
             if (pointer.y >= (game.config.height as number) - 100) {
                 return;
             }
-            if (!this.hasTouched || this.gameManager.isGameOver()) {
-                this.events.emit('gameStarted');
-                this.hasTouched = true;
-            }
-            this.events.emit('tap');
-            // Place fruit
-            if (this.canTouch) {
-                const fruit = new Fruit(this, pointer.x, 20, this.nextFruit);
-                this.fruits.add(fruit, true);
-                fruit.body.velocity.add(new Phaser.Math.Vector2(0, 500));
-                this.touchCooldown = 500;
-                this.canTouch = false;
-                this.setNextFruit();
-            }
+            this.events.emit(
+                'dropFruit',
+                this.controls === 'tap' ? pointer.x : this.player.x
+            );
         });
 
         this.nextFruitSprite = new Phaser.GameObjects.Sprite(
@@ -174,8 +211,20 @@ export class MainScene extends Phaser.Scene {
         this.nextFruitSprite.setVisible(false);
         this.add.existing(this.nextFruitSprite);
 
+        this.player = new Player(this, 100, 20, this.keys);
+        this.add.existing(this.player);
+
         this.highestFruit = 0;
         this.setNextFruit();
+
+        this.controls = gameOptions.controls;
+        this.onControlsChange(this.controls);
+
+        // HACK: get some debug values up initially
+        setTimeout(() => {
+            this.events.emit('debug', 'moveLeftHeld', false);
+            this.events.emit('debug', 'moveRightHeld', false);
+        }, 100);
     }
 
     setNextFruit(): void {
@@ -228,6 +277,10 @@ export class MainScene extends Phaser.Scene {
         if (debugKey && this.input.keyboard.checkDown(debugKey, 1000)) {
             this.events.emit('debugToggle');
         }
+
+        if (this.controls === 'move') {
+            this.player.update(time, delta);
+        }
     }
 
     pulsateImage(pulsatingImage) {
@@ -247,5 +300,14 @@ export class MainScene extends Phaser.Scene {
                 this.barTween.setFinishedState();
             },
         });
+    }
+
+    onControlsChange(controls) {
+        if (controls === 'move') {
+            this.player.setVisible(true);
+        } else {
+            this.player.setVisible(false);
+        }
+        this.controls = controls;
     }
 }

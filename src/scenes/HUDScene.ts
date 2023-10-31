@@ -14,6 +14,8 @@ export class HUDScene extends Phaser.Scene {
     private winText: Phaser.GameObjects.Text;
     private instructionText: Phaser.GameObjects.Text;
     private fingerIcon: Phaser.GameObjects.Image;
+    private leftArrow: Phaser.GameObjects.Image;
+    private rightArrow: Phaser.GameObjects.Image;
 
     constructor() {
         super({
@@ -21,7 +23,11 @@ export class HUDScene extends Phaser.Scene {
         });
     }
 
-    preload(): void {}
+    preload(): void {
+        this.load.image('fingerIcon', './assets/img/tap.png');
+        this.load.image('leftArrow', './assets/img/LeftArrow.svg');
+        this.load.image('rightArrow', './assets/img/RightArrow.svg');
+    }
 
     create(): void {
         this.add.text(10, 10, 'Score:');
@@ -42,6 +48,8 @@ export class HUDScene extends Phaser.Scene {
         this.mainScene.events.on('gameStarted', this.onGameStarted.bind(this));
         this.mainScene.events.on('tap', this.onTap.bind(this));
         this.mainScene.events.on('win', this.onWin.bind(this));
+
+        this.game.events.on('controlsChange', this.onControlsChange.bind(this));
 
         this.gameOverText = this.add.text(
             (game.config.width as number) / 4,
@@ -82,6 +90,39 @@ export class HUDScene extends Phaser.Scene {
         );
         this.fingerIcon.setOrigin(0.5);
         this.fingerIcon.setScale(0.2, 0.2);
+
+        this.leftArrow = this.add.image(
+            0,
+            (game.config.height as number) / 2 + 50,
+            'leftArrow'
+        );
+        this.leftArrow.setOrigin(0.5);
+        this.leftArrow.setScale(0.1, 0.1);
+        this.leftArrow.x = this.leftArrow.displayWidth / 2;
+        this.leftArrow.setInteractive().on('pointerdown', () => {
+            this.mainScene.events.emit('moveLeftStart');
+        });
+        this.leftArrow.setInteractive().on('pointerup', () => {
+            this.mainScene.events.emit('moveLeftStop');
+        });
+
+        this.rightArrow = this.add.image(
+            0,
+            (game.config.height as number) / 2 + 50,
+            'rightArrow'
+        );
+        this.rightArrow.setOrigin(0.5);
+        this.rightArrow.setScale(0.1, 0.1);
+        this.rightArrow.x =
+            this.cameras.main.width - this.rightArrow.displayWidth / 2;
+        this.rightArrow.setInteractive().on('pointerdown', () => {
+            this.mainScene.events.emit('moveRightStart');
+        });
+        this.rightArrow.setInteractive().on('pointerup', () => {
+            this.mainScene.events.emit('moveRightStop');
+        });
+
+        this.onControlsChange(gameOptions.controls);
     }
 
     updateScore(): void {
@@ -131,5 +172,15 @@ export class HUDScene extends Phaser.Scene {
 
     onWin(): void {
         this.winText.setVisible(true);
+    }
+
+    onControlsChange(controls) {
+        if (controls === 'move') {
+            this.leftArrow.setVisible(true);
+            this.rightArrow.setVisible(true);
+        } else {
+            this.leftArrow.setVisible(false);
+            this.rightArrow.setVisible(false);
+        }
     }
 }
