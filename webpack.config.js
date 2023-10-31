@@ -55,7 +55,7 @@ module.exports = (env) => {
                         from: 'assets/img/**',
                         to: '.',
                         globOptions: {
-                            ignore: ['**/*.xcf'],
+                            ignore: ['**/*.xcf', '**/*.inkscape.svg'],
                         },
                     },
                     { from: 'index.html', to: '.' },
