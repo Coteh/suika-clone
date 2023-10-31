@@ -72,6 +72,14 @@
                             <span class="toggle">Suika</span>
                         </div>
                     </div>
+                    <div class="settings-item setting controls">
+                        <div class="settings-item-column">
+                            <span>Controls</span>
+                        </div>
+                        <div class="settings-item-column">
+                            <span class="toggle">Tap</span>
+                        </div>
+                    </div>
                 </div>
                 <span class="space"></span>
                 <div class="settings-item-group">
@@ -80,7 +88,7 @@
                             href="https://github.com/Coteh/suika-clone/releases"
                             target="_blank"
                         >
-                            <span class="version-number">v0.0.4</span>
+                            <span class="version-number">v0.0.5</span>
                         </a>
                     </div>
                 </div>
@@ -196,7 +204,7 @@
             if (typeof Sentry !== 'undefined') {
                 Sentry.onLoad(() => {
                     Sentry.init({
-                        release: 'suika-clone@0.0.4',
+                        release: 'suika-clone@0.0.5',
                         beforeSend(event) {
                             if (
                                 event.request.url.includes('localhost') ||
@@ -211,7 +219,7 @@
             }
 
             gtag('event', 'game_open', {
-                version: '0.0.4',
+                version: '0.0.5',
             });
         </script>
     </body>
