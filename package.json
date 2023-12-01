@@ -1,6 +1,6 @@
 {
     "name": "suika-clone",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "description": "Clone of Suika Game made in Phaser 3 and TypeScript",
     "repository": {
         "type": "git",
