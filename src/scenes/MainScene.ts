@@ -14,7 +14,7 @@ export class MainScene extends Phaser.Scene {
 
     private keys: Map<string, Phaser.Input.Keyboard.Key>;
 
-    private fruits: Phaser.Physics.Arcade.Group;
+    private fruits: Phaser.GameObjects.Group;
 
     private touchCooldown: number = 0;
     private canTouch: boolean;
@@ -124,9 +124,13 @@ export class MainScene extends Phaser.Scene {
             this.events.emit('tap');
             // Place fruit
             if (this.canTouch) {
-                const fruit = new Fruit(this, posX, 20, this.nextFruit);
+                const fruit = new Fruit(
+                    this.matter.world,
+                    posX,
+                    20,
+                    this.nextFruit
+                );
                 this.fruits.add(fruit, true);
-                fruit.body.velocity.add(new Phaser.Math.Vector2(0, 500));
                 this.touchCooldown = 500;
                 this.canTouch = false;
                 this.setNextFruit();
@@ -134,49 +138,74 @@ export class MainScene extends Phaser.Scene {
         });
         this.game.events.on('controlsChange', this.onControlsChange.bind(this));
 
-        this.fruits = this.physics.add.group({
+        this.fruits = this.add.group({
             quantity: 0,
             maxSize: 0,
-            bounceX: 0.5,
-            bounceY: 0.5,
-            collideWorldBounds: true,
-            velocityX: 0,
-            velocityY: 0,
         });
 
         this.fruits.maxSize = -1;
 
-        this.physics.add.collider(
-            this.fruits,
-            undefined,
-            function (fruit1, fruit2) {
-                // Merge fruit if they're the same
-                if (fruit1.fruitType == fruit2.fruitType) {
-                    const fruit = new Fruit(
-                        this,
-                        fruit1.x,
-                        fruit1.y - 50,
-                        fruit1.fruitType + 1
-                    );
-                    this.fruits.add(fruit, true);
-                    this.fruits.remove(fruit1, true, true);
-                    this.fruits.remove(fruit2, true, true);
-                    var score: number = this.registry.get('score');
-                    score += 100 * (fruit1.fruitType + 1);
-                    this.registry.set('score', score);
-                    this.events.emit('updateScore');
-                    if (fruit1.fruitType > this.highestFruit) {
-                        this.highestFruit = fruit1.fruitType;
-                    }
+        this.matter.world.setBounds(
+            0,
+            0,
+            game.config.width as number,
+            game.config.height as number,
+            32,
+            true,
+            true,
+            false,
+            true
+        );
+
+        // Set up collision event for the group
+        this.matter.world.on(
+            'collisionstart',
+            function (event) {
+                event.pairs.forEach(function (pair) {
+                    const bodyA = pair.bodyA;
+                    const bodyB = pair.bodyB;
+
+                    // Check if bodies are in the group
                     if (
-                        fruit1.fruitType + 1 == FruitType.Watermelon &&
-                        !this.gameManager.getDidWin()
+                        this.fruits.contains(bodyA.gameObject) &&
+                        this.fruits.contains(bodyB.gameObject)
                     ) {
-                        this.events.emit('win');
-                        this.gameManager.setDidWin(true);
+                        const fruit1 = bodyA.gameObject;
+                        const fruit2 = bodyB.gameObject;
+
+                        // Merge fruits if they're the same
+                        if (fruit1.fruitType == fruit2.fruitType) {
+                            const fruit = new Fruit(
+                                this.matter.world,
+                                fruit1.x,
+                                fruit1.y - 50,
+                                fruit1.fruitType + 1
+                            );
+                            this.fruits.add(fruit, true);
+                            this.fruits.remove(fruit1, true, true);
+                            this.fruits.remove(fruit2, true, true);
+
+                            var score: number = this.registry.get('score');
+                            score += 100 * (fruit1.fruitType + 1);
+                            this.registry.set('score', score);
+                            this.events.emit('updateScore');
+
+                            if (fruit1.fruitType > this.highestFruit) {
+                                this.highestFruit = fruit1.fruitType;
+                            }
+
+                            if (
+                                fruit1.fruitType + 1 == FruitType.Watermelon &&
+                                !this.gameManager.getDidWin()
+                            ) {
+                                this.events.emit('win');
+                                this.gameManager.setDidWin(true);
+                            }
+                        }
                     }
-                }
-            }.bind(this)
+                }, this);
+            },
+            this
         );
 
         const barObj = new Phaser.GameObjects.Image(

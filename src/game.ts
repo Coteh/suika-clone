@@ -58,10 +58,10 @@ window.onload = () => {
             autoCenter: Phaser.Scale.CENTER_BOTH,
         },
         physics: {
-            default: 'arcade',
-            arcade: {
+            default: 'matter',
+            matter: {
                 debug: !!process.env.IS_DEBUG,
-                gravity: { y: 300 },
+                enableSleeping: true,
             },
         },
     };

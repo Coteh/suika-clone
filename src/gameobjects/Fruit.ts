@@ -38,23 +38,28 @@ export function fruitTypeToTextureString(fruitType: FruitType) {
     return sprite;
 }
 
-export class Fruit extends Phaser.Physics.Arcade.Image {
+export class Fruit extends Phaser.Physics.Matter.Image {
     fruitType: FruitType;
 
     lifetime: number;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, type: FruitType) {
+    constructor(
+        world: Phaser.Physics.Matter.World,
+        x: number,
+        y: number,
+        type: FruitType
+    ) {
         let sprite = fruitTypeToTextureString(type);
-        super(scene, x, y, sprite);
-        scene.physics.world.enable(this);
-        this.setScale(1 + 0.5 * type);
+        super(world, x, y, sprite);
         this.fruitType = type;
-        this.setCircle(30);
+        this.setScale(1 + 0.5 * type);
+        if (this.fruitType == FruitType.Grapes) {
+            this.setCircle(this.displayWidth / 2.95);
+            this.setOrigin(0.65, 0.6);
+        } else {
+            this.setCircle(this.displayWidth / 2);
+        }
         this.lifetime = 0;
-
-        // Enable debugging for the physics body
-        this.body.debugShowBody = true;
-        this.body.debugBodyColor = 0x00ff00; // Color of the debug body
     }
 
     public update(time: number, delta: number): void {
