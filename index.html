@@ -88,7 +88,7 @@
                             href="https://github.com/Coteh/suika-clone/releases"
                             target="_blank"
                         >
-                            <span class="version-number">v0.0.5</span>
+                            <span class="version-number">v0.1.0</span>
                         </a>
                     </div>
                 </div>
@@ -204,7 +204,7 @@
             if (typeof Sentry !== 'undefined') {
                 Sentry.onLoad(() => {
                     Sentry.init({
-                        release: 'suika-clone@0.0.5',
+                        release: 'suika-clone@0.1.0',
                         beforeSend(event) {
                             if (
                                 event.request.url.includes('localhost') ||
@@ -219,7 +219,7 @@
             }
 
             gtag('event', 'game_open', {
-                version: '0.0.5',
+                version: '0.1.0',
             });
         </script>
     </body>
