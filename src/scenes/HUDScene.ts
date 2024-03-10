@@ -1,7 +1,10 @@
+import { FruitType, fruitTypeToTextureString } from '../gameobjects/Fruit';
+
 const GAME_OVER_SCREEN_OFFSET: number = -200;
 
 export class HUDScene extends Phaser.Scene {
     private mainScene: Phaser.Scene;
+    private gameStarted: boolean;
 
     private scoreText: Phaser.GameObjects.Text;
     private highscoreText: Phaser.GameObjects.Text;
@@ -16,6 +19,9 @@ export class HUDScene extends Phaser.Scene {
     private fingerIcon: Phaser.GameObjects.Image;
     private leftArrow: Phaser.GameObjects.Image;
     private rightArrow: Phaser.GameObjects.Image;
+
+    private nextFruitText: Phaser.GameObjects.Text;
+    private nextFruitSprite: Phaser.GameObjects.Sprite;
 
     constructor() {
         super({
@@ -46,8 +52,13 @@ export class HUDScene extends Phaser.Scene {
         this.mainScene.events.on('updateScore', this.updateScore.bind(this));
         this.mainScene.events.on('gameOver', this.gameOver.bind(this));
         this.mainScene.events.on('gameStarted', this.onGameStarted.bind(this));
+        this.mainScene.events.on('gameInit', this.onGameInit.bind(this));
         this.mainScene.events.on('tap', this.onTap.bind(this));
         this.mainScene.events.on('win', this.onWin.bind(this));
+        this.mainScene.events.on(
+            'nextFruit',
+            this.setNextFruitSprite.bind(this)
+        );
 
         this.game.events.on('controlsChange', this.onControlsChange.bind(this));
 
@@ -81,6 +92,7 @@ export class HUDScene extends Phaser.Scene {
             }
         );
         this.instructionText.setOrigin(0.5);
+        this.instructionText.setVisible(false);
 
         // Add the finger icon
         this.fingerIcon = this.add.image(
@@ -90,6 +102,7 @@ export class HUDScene extends Phaser.Scene {
         );
         this.fingerIcon.setOrigin(0.5);
         this.fingerIcon.setScale(0.2, 0.2);
+        this.fingerIcon.setVisible(false);
 
         this.leftArrow = this.add.image(
             0,
@@ -123,6 +136,31 @@ export class HUDScene extends Phaser.Scene {
         });
 
         this.onControlsChange(gameOptions.controls);
+
+        // Add the next fruit text
+        this.nextFruitText = this.add.text(
+            (game.config.width as number) - 40,
+            56,
+            'Up Next',
+            {
+                fontSize: '18px',
+                align: 'center',
+            }
+        );
+        this.nextFruitText.setOrigin(0.5);
+        this.nextFruitText.setVisible(false);
+
+        // Add the next fruit sprite
+        this.nextFruitSprite = new Phaser.GameObjects.Sprite(
+            this,
+            (game.config.width as number) - 40,
+            100,
+            'apple'
+        );
+        this.nextFruitSprite.setVisible(false);
+        this.add.existing(this.nextFruitSprite);
+
+        this.scene.bringToTop();
     }
 
     updateScore(): void {
@@ -157,6 +195,16 @@ export class HUDScene extends Phaser.Scene {
         }
         this.instructionText.setVisible(true);
         this.fingerIcon.setVisible(true);
+        this.gameStarted = false;
+    }
+
+    onGameInit(): void {
+        // If game is already started by this point, do not make them visible
+        if (this.gameStarted) {
+            return;
+        }
+        this.instructionText.setVisible(true);
+        this.fingerIcon.setVisible(true);
     }
 
     onGameStarted(): void {
@@ -164,6 +212,7 @@ export class HUDScene extends Phaser.Scene {
         this.fingerIcon.setVisible(false);
         this.gameOverText.setVisible(false);
         this.beatHighscoreText.setVisible(false);
+        this.gameStarted = true;
     }
 
     onTap(): void {
@@ -174,7 +223,7 @@ export class HUDScene extends Phaser.Scene {
         this.winText.setVisible(true);
     }
 
-    onControlsChange(controls) {
+    onControlsChange(controls): void {
         if (controls === 'move') {
             this.leftArrow.setVisible(true);
             this.rightArrow.setVisible(true);
@@ -182,5 +231,11 @@ export class HUDScene extends Phaser.Scene {
             this.leftArrow.setVisible(false);
             this.rightArrow.setVisible(false);
         }
+    }
+
+    setNextFruitSprite(nextFruit: FruitType): void {
+        this.nextFruitSprite.setTexture(fruitTypeToTextureString(nextFruit));
+        this.nextFruitSprite.setVisible(true);
+        this.nextFruitText.setVisible(true);
     }
 }

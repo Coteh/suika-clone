@@ -21,7 +21,6 @@ export class MainScene extends Phaser.Scene {
     private hasTouched: boolean;
 
     private nextFruit: FruitType;
-    private nextFruitSprite: Phaser.GameObjects.Sprite;
     private highestFruit: FruitType;
 
     private bar: Phaser.GameObjects.Image;
@@ -231,29 +230,32 @@ export class MainScene extends Phaser.Scene {
             );
         });
 
-        this.nextFruitSprite = new Phaser.GameObjects.Sprite(
-            this,
-            (game.config.width as number) - 40,
-            100,
-            'apple'
-        );
-        this.nextFruitSprite.setVisible(false);
-        this.add.existing(this.nextFruitSprite);
-
         this.player = new Player(this, 100, 20, this.keys);
         this.add.existing(this.player);
 
         this.highestFruit = 0;
-        this.setNextFruit();
 
         this.controls = gameOptions.controls;
         this.onControlsChange(this.controls);
 
-        // HACK: get some debug values up initially
-        setTimeout(() => {
-            this.events.emit('debug', 'moveLeftHeld', false);
-            this.events.emit('debug', 'moveRightHeld', false);
-        }, 100);
+        this.scene
+            .get('HUDScene')
+            .events.once('create', this.onHUDSceneCreate, this);
+        if (process.env.IS_DEBUG) {
+            this.scene
+                .get('DebugScene')
+                .events.once('create', this.onDebugSceneCreate, this);
+        }
+    }
+
+    onHUDSceneCreate(): void {
+        this.setNextFruit();
+        this.events.emit('gameInit');
+    }
+
+    onDebugSceneCreate(): void {
+        this.events.emit('debug', 'moveLeftHeld', false);
+        this.events.emit('debug', 'moveRightHeld', false);
     }
 
     setNextFruit(): void {
@@ -270,10 +272,7 @@ export class MainScene extends Phaser.Scene {
         ) {
             this.nextFruit = FruitType.Pear;
         }
-        this.nextFruitSprite.setTexture(
-            fruitTypeToTextureString(this.nextFruit)
-        );
-        this.nextFruitSprite.setVisible(true);
+        this.events.emit('nextFruit', this.nextFruit);
     }
 
     update(time: number, delta: number): void {
