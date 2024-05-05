@@ -234,6 +234,7 @@ export class MainScene extends Phaser.Scene {
         this.add.existing(this.player);
 
         this.highestFruit = 0;
+        this.setNextFruit();
 
         this.controls = gameOptions.controls;
         this.onControlsChange(this.controls);
@@ -249,7 +250,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     onHUDSceneCreate(): void {
-        this.setNextFruit();
+        this.events.emit('nextFruit', this.nextFruit);
         this.events.emit('gameInit');
     }
 

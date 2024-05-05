@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Add "Next Fruit" label above the next fruit in HUD
 
+### Fixed
+
+-   Fruit dropped before first fruit is determined throws error due to underlying Matter physics body receiving invalid radius
+
 ## [0.1.0] - 2023-11-30
 
 ### Changed
