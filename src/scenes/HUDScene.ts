@@ -19,6 +19,7 @@ export class HUDScene extends Phaser.Scene {
     private leftArrow: Phaser.GameObjects.Image;
     private rightArrow: Phaser.GameObjects.Image;
 
+    private nextFruitBack: Phaser.GameObjects.Rectangle;
     private nextFruitText: Phaser.GameObjects.Text;
     private nextFruitSprite: Phaser.GameObjects.Sprite;
 
@@ -136,14 +137,19 @@ export class HUDScene extends Phaser.Scene {
 
         this.onControlsChange(gameOptions.controls);
 
+        // Add the next fruit backing
+        this.nextFruitBack = this.add.rectangle((game.config.width as number) - 40, 86, 80, 100, 0x6a4325)
+
         // Add the next fruit text
         this.nextFruitText = this.add.text(
             (game.config.width as number) - 40,
             56,
-            'Up Next',
+            'Next',
             {
-                fontSize: '18px',
+                fontSize: '24px',
                 align: 'center',
+                stroke: "#000",
+                strokeThickness: 1,
             }
         );
         this.nextFruitText.setOrigin(0.5);

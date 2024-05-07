@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--   Add "Next Fruit" label above the next fruit in HUD
+-   Tweak Next fruit UI element to make it stand out more
 
 ### Fixed
 
