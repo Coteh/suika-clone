@@ -85,6 +85,7 @@ export class MainScene extends Phaser.Scene {
             this.fruits.clear(true, true);
             this.gameManager.setGameOver(true);
             this.registry.set('score', 0);
+            this.registry.set('gameStarted', false);
             this.events.emit('updateScore');
             this.highestFruit = 0;
             this.setNextFruit();
@@ -117,6 +118,7 @@ export class MainScene extends Phaser.Scene {
         });
         this.events.on('dropFruit', (posX) => {
             if (!this.hasTouched || this.gameManager.isGameOver()) {
+                this.registry.set('gameStarted', true);
                 this.events.emit('gameStarted');
                 this.hasTouched = true;
             }
@@ -247,6 +249,8 @@ export class MainScene extends Phaser.Scene {
                 .get('DebugScene')
                 .events.once('create', this.onDebugSceneCreate, this);
         }
+
+        this.registry.set('gameStarted', false);
     }
 
     onHUDSceneCreate(): void {

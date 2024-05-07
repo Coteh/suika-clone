@@ -4,7 +4,6 @@ const GAME_OVER_SCREEN_OFFSET: number = -200;
 
 export class HUDScene extends Phaser.Scene {
     private mainScene: Phaser.Scene;
-    private gameStarted: boolean;
 
     private scoreText: Phaser.GameObjects.Text;
     private highscoreText: Phaser.GameObjects.Text;
@@ -195,12 +194,11 @@ export class HUDScene extends Phaser.Scene {
         }
         this.instructionText.setVisible(true);
         this.fingerIcon.setVisible(true);
-        this.gameStarted = false;
     }
 
     onGameInit(): void {
         // If game is already started by this point, do not make them visible
-        if (this.gameStarted) {
+        if (this.registry.get('gameStarted')) {
             return;
         }
         this.instructionText.setVisible(true);
@@ -212,7 +210,6 @@ export class HUDScene extends Phaser.Scene {
         this.fingerIcon.setVisible(false);
         this.gameOverText.setVisible(false);
         this.beatHighscoreText.setVisible(false);
-        this.gameStarted = true;
     }
 
     onTap(): void {

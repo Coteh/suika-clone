@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 -   Fruit dropped before first fruit is determined throws error due to underlying Matter physics body receiving invalid radius
+-   "Touch to place fruit" dialog not disappearing from HUD if player drops fruit immediately upon game load
 
 ## [0.1.0] - 2023-11-30
 
