@@ -11,28 +11,28 @@ export enum FruitType {
 
 export function fruitTypeToTextureString(fruitType: FruitType) {
     let resolvedFruitType = fruitType % 8;
-    let sprite = 'apple';
+    let sprite = `apple_${gameOptions.theme}`;
     switch (resolvedFruitType) {
         case FruitType.Pear:
-            sprite = 'pear';
+            sprite = `pear_${gameOptions.theme}`;
             break;
         case FruitType.Grapes:
-            sprite = 'grapes';
+            sprite = `grapes_${gameOptions.theme}`;
             break;
         case FruitType.Orange:
-            sprite = 'orange';
+            sprite = `orange_${gameOptions.theme}`;
             break;
         case FruitType.Lemon:
-            sprite = 'lemon';
+            sprite = `lemon_${gameOptions.theme}`;
             break;
         case FruitType.Mango:
-            sprite = 'mango';
+            sprite = `mango_${gameOptions.theme}`;
             break;
         case FruitType.Melon:
-            sprite = 'melon';
+            sprite = `melon_${gameOptions.theme}`;
             break;
         case FruitType.Watermelon:
-            sprite = 'watermelon';
+            sprite = `watermelon_${gameOptions.theme}`;
             break;
     }
     return sprite;
@@ -53,7 +53,10 @@ export class Fruit extends Phaser.Physics.Matter.Image {
         super(world, x, y, sprite);
         this.fruitType = type;
         this.setScale(1 + 0.5 * type);
-        if (this.fruitType == FruitType.Grapes) {
+        if (
+            this.fruitType == FruitType.Grapes &&
+            gameOptions.theme === 'fruit_basket'
+        ) {
             this.setCircle(this.displayWidth / 2.95);
             this.setOrigin(0.65, 0.6);
         } else {

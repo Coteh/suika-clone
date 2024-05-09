@@ -1,14 +1,16 @@
-import { GameControl } from '../types';
+import { GameControl, GameTheme } from '../types';
 
 const PLAYED_BEFORE_KEY = 'played_before';
 const GAME_OPTIONS_KEY = 'game_options';
 
 export interface GameOptions {
     controls: GameControl;
+    theme: GameTheme;
 }
 
 let gameOptions: GameOptions = {
     controls: 'tap',
+    theme: 'fruit_basket',
 };
 
 export function loadGameOptions() {

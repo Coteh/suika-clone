@@ -5,7 +5,7 @@ import {
 } from '../gameobjects/Fruit';
 import { Player } from '../gameobjects/Player';
 import { GameManager } from '../managers/GameManager';
-import { GameControl } from '../types';
+import { GameControl, GameTheme } from '../types';
 
 export class MainScene extends Phaser.Scene {
     private gameManager: GameManager;
@@ -37,23 +37,6 @@ export class MainScene extends Phaser.Scene {
     }
 
     preload(): void {
-        this.load.image('apple', './assets/img/themes/fruit_basket/Apple.png');
-        this.load.image('pear', './assets/img/themes/fruit_basket/Pear.png');
-        this.load.image(
-            'grapes',
-            './assets/img/themes/fruit_basket/Grapes.png'
-        );
-        this.load.image(
-            'orange',
-            './assets/img/themes/fruit_basket/Orange.png'
-        );
-        this.load.image('lemon', './assets/img/themes/fruit_basket/Lemon.png');
-        this.load.image('mango', './assets/img/themes/fruit_basket/Mango.png');
-        this.load.image('melon', './assets/img/themes/fruit_basket/Melon.png');
-        this.load.image(
-            'watermelon',
-            './assets/img/themes/fruit_basket/Watermelon.png'
-        );
         this.load.image('bar', './assets/img/healthbar.png');
         this.load.image('player', './assets/img/Player.png');
         this.keys = new Map([
@@ -64,6 +47,31 @@ export class MainScene extends Phaser.Scene {
         if (process.env.IS_DEBUG) {
             this.keys.set('D', this.input.keyboard.addKey('D'));
         }
+        // TODO: Could the themes not selected by user be loaded later?
+        // TODO: Iterate all themes and load them
+        this.loadTheme('fruit_basket');
+        this.loadTheme('numbers');
+    }
+
+    loadTheme(theme: GameTheme): void {
+        console.log('Loading theme', theme);
+        this.load.image(`apple_${theme}`, `./assets/img/themes/${theme}/1.png`);
+        this.load.image(`pear_${theme}`, `./assets/img/themes/${theme}/2.png`);
+        this.load.image(
+            `grapes_${theme}`,
+            `./assets/img/themes/${theme}/3.png`
+        );
+        this.load.image(
+            `orange_${theme}`,
+            `./assets/img/themes/${theme}/4.png`
+        );
+        this.load.image(`lemon_${theme}`, `./assets/img/themes/${theme}/5.png`);
+        this.load.image(`mango_${theme}`, `./assets/img/themes/${theme}/6.png`);
+        this.load.image(`melon_${theme}`, `./assets/img/themes/${theme}/7.png`);
+        this.load.image(
+            `watermelon_${theme}`,
+            `./assets/img/themes/${theme}/8.png`
+        );
     }
 
     create(): void {
@@ -138,6 +146,10 @@ export class MainScene extends Phaser.Scene {
             }
         });
         this.game.events.on('controlsChange', this.onControlsChange.bind(this));
+        this.game.events.on('themeChange', (newTheme: GameTheme) => {
+            // Update the next fruit sprite to the new theme
+            this.events.emit('nextFruit', this.nextFruit);
+        });
 
         this.fruits = this.add.group({
             quantity: 0,

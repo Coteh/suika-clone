@@ -105,7 +105,22 @@ settings.forEach((setting) => {
     setting.addEventListener('click', (e) => {
         let optionChanged = false;
         if (elem.classList.contains(THEME_SETTING_NAME)) {
-            renderNotification('Coming soon');
+            if (game.registry.get('gameStarted')) {
+                renderNotification(
+                    'You can only change theme when game is not currently in progress'
+                );
+                return;
+            }
+            gameOptions.theme =
+                gameOptions.theme === 'fruit_basket'
+                    ? 'numbers'
+                    : 'fruit_basket';
+            game.events.emit('themeChange', gameOptions.theme);
+            toggle.innerHTML =
+                gameOptions.theme === 'fruit_basket'
+                    ? 'Fruit Basket'
+                    : 'Numbers';
+            optionChanged = true;
         } else if (elem.classList.contains(CONTROLS_SETTING_NAME)) {
             gameOptions.controls =
                 gameOptions.controls === 'tap' ? 'move' : 'tap';
@@ -117,7 +132,10 @@ settings.forEach((setting) => {
             saveGameOptions(gameOptions);
         }
     });
-    if (elem.classList.contains(CONTROLS_SETTING_NAME)) {
+    if (elem.classList.contains(THEME_SETTING_NAME)) {
+        toggle.innerHTML =
+            gameOptions.theme === 'fruit_basket' ? 'Fruit Basket' : 'Numbers';
+    } else if (elem.classList.contains(CONTROLS_SETTING_NAME)) {
         toggle.innerHTML = gameOptions.controls === 'move' ? 'Move' : 'Tap';
     }
 });

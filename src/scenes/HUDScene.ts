@@ -138,7 +138,13 @@ export class HUDScene extends Phaser.Scene {
         this.onControlsChange(gameOptions.controls);
 
         // Add the next fruit backing
-        this.nextFruitBack = this.add.rectangle((game.config.width as number) - 40, 86, 80, 100, 0x6a4325)
+        this.nextFruitBack = this.add.rectangle(
+            (game.config.width as number) - 40,
+            86,
+            80,
+            100,
+            0x6a4325
+        );
 
         // Add the next fruit text
         this.nextFruitText = this.add.text(
@@ -148,7 +154,7 @@ export class HUDScene extends Phaser.Scene {
             {
                 fontSize: '24px',
                 align: 'center',
-                stroke: "#000",
+                stroke: '#000',
                 strokeThickness: 1,
             }
         );
@@ -160,7 +166,7 @@ export class HUDScene extends Phaser.Scene {
             this,
             (game.config.width as number) - 40,
             100,
-            'apple'
+            `apple_${gameOptions.theme}`
         );
         this.nextFruitSprite.setVisible(false);
         this.add.existing(this.nextFruitSprite);
