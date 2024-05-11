@@ -20,6 +20,9 @@ export class MainScene extends Phaser.Scene {
     private canTouch: boolean;
     private hasTouched: boolean;
 
+    private dangerTimer: number = 0;
+    private inDanger: boolean = false;
+
     private nextFruit: FruitType;
     private highestFruit: FruitType;
 
@@ -29,6 +32,10 @@ export class MainScene extends Phaser.Scene {
     private player: Player;
 
     private controls: GameControl;
+
+    // Only for debug
+    private mergeDisabled: boolean = false;
+    private heldNextFruit: FruitType | null = null;
 
     constructor() {
         super({
@@ -45,7 +52,11 @@ export class MainScene extends Phaser.Scene {
             ['SPACE', this.input.keyboard.addKey('SPACE')],
         ]);
         if (process.env.IS_DEBUG) {
-            this.keys.set('D', this.input.keyboard.addKey('D'));
+            this.keys.set('DEBUG_TOGGLE', this.input.keyboard.addKey('D'));
+            this.keys.set('FRUIT_TOGGLE', this.input.keyboard.addKey('F'));
+            this.keys.set('NEXT_FRUIT_HOLD', this.input.keyboard.addKey('G'));
+            this.keys.set('MERGE_TOGGLE', this.input.keyboard.addKey('M'));
+            this.keys.set('REMOVE_ALL_FRUIT', this.input.keyboard.addKey('R'));
         }
         // TODO: Could the themes not selected by user be loaded later?
         // TODO: Iterate all themes and load them
@@ -96,7 +107,7 @@ export class MainScene extends Phaser.Scene {
             this.registry.set('gameStarted', false);
             this.events.emit('updateScore');
             this.highestFruit = 0;
-            this.setNextFruit();
+            this.setNextFruit(this.heldNextFruit);
         });
         this.events.on('gameStarted', () => {
             this.gameManager.setGameOver(false);
@@ -142,7 +153,7 @@ export class MainScene extends Phaser.Scene {
                 this.fruits.add(fruit, true);
                 this.touchCooldown = 500;
                 this.canTouch = false;
-                this.setNextFruit();
+                this.setNextFruit(this.heldNextFruit);
             }
         });
         this.game.events.on('controlsChange', this.onControlsChange.bind(this));
@@ -174,6 +185,9 @@ export class MainScene extends Phaser.Scene {
         this.matter.world.on(
             'collisionstart',
             function (event) {
+                if (this.mergeDisabled) {
+                    return;
+                }
                 event.pairs.forEach(function (pair) {
                     const bodyA = pair.bodyA;
                     const bodyB = pair.bodyB;
@@ -248,7 +262,7 @@ export class MainScene extends Phaser.Scene {
         this.add.existing(this.player);
 
         this.highestFruit = 0;
-        this.setNextFruit();
+        this.setNextFruit(this.heldNextFruit);
 
         this.controls = gameOptions.controls;
         this.onControlsChange(this.controls);
@@ -275,19 +289,24 @@ export class MainScene extends Phaser.Scene {
         this.events.emit('debug', 'moveRightHeld', false);
     }
 
-    setNextFruit(): void {
-        this.nextFruit = FruitType.Apple;
-        const randVal = Math.round(Math.random() * 4);
-        if (randVal % 4 === 0 && this.highestFruit >= FruitType.Orange) {
-            this.nextFruit = FruitType.Orange;
-        } else if (randVal % 3 === 0 && this.highestFruit >= FruitType.Grapes) {
-            this.nextFruit = FruitType.Grapes;
-        } else if (
-            randVal % 2 === 0 &&
-            this.hasTouched &&
-            !this.gameManager.isGameOver()
-        ) {
-            this.nextFruit = FruitType.Pear;
+    setNextFruit(nextFruit?: FruitType): void {
+        this.nextFruit = nextFruit || FruitType.Apple;
+        if (nextFruit == null) {
+            const randVal = Math.round(Math.random() * 4);
+            if (randVal % 4 === 0 && this.highestFruit >= FruitType.Orange) {
+                this.nextFruit = FruitType.Orange;
+            } else if (
+                randVal % 3 === 0 &&
+                this.highestFruit >= FruitType.Grapes
+            ) {
+                this.nextFruit = FruitType.Grapes;
+            } else if (
+                randVal % 2 === 0 &&
+                this.hasTouched &&
+                !this.gameManager.isGameOver()
+            ) {
+                this.nextFruit = FruitType.Pear;
+            }
         }
         this.events.emit('nextFruit', this.nextFruit);
     }
@@ -300,16 +319,37 @@ export class MainScene extends Phaser.Scene {
                 sprite.update(time, delta);
                 if (sprite.lifetime > 1000) {
                     if (sprite.y < 100) {
-                        this.events.emit('gameOver');
-                        if (this.barTween) {
-                            this.barTween.setFinishedState();
-                            this.bar.alpha = 0;
+                        if (!this.inDanger) {
+                            this.dangerTimer = 2500;
+                            this.inDanger = true;
                         }
-                    } else if (sprite.y < 250) {
-                        this.pulsateImage(this.bar);
+                        this.pulsateImage(this.bar, 250);
+                    } else if (sprite.y < 250 && !this.inDanger) {
+                        this.pulsateImage(this.bar, 500);
                     }
                 }
             });
+            if (
+                !this.fruits.children.entries.some(
+                    (entry: Fruit) => entry.lifetime > 1000 && entry.y < 100
+                ) &&
+                this.inDanger
+            ) {
+                this.inDanger = false;
+                this.dangerTimer = 0;
+                console.log('no longer in danger');
+            }
+        }
+
+        if (this.dangerTimer <= 0 && this.inDanger) {
+            this.events.emit('gameOver');
+            if (this.barTween) {
+                this.barTween.setFinishedState();
+                this.bar.alpha = 0;
+            }
+            this.inDanger = false;
+        } else {
+            this.dangerTimer -= delta;
         }
 
         if (this.touchCooldown <= 0) {
@@ -318,9 +358,53 @@ export class MainScene extends Phaser.Scene {
             this.touchCooldown -= delta;
         }
 
-        var debugKey = this.keys.get('D');
+        const debugKey = this.keys.get('DEBUG_TOGGLE');
         if (debugKey && this.input.keyboard.checkDown(debugKey, 1000)) {
             this.events.emit('debugToggle');
+        }
+
+        const changeFruitKey = this.keys.get('FRUIT_TOGGLE');
+        if (
+            changeFruitKey &&
+            this.input.keyboard.checkDown(changeFruitKey, 1000)
+        ) {
+            this.setNextFruit(
+                (this.nextFruit + 1) % (FruitType.Watermelon + 1)
+            );
+        }
+
+        const nextFruitHoldKey = this.keys.get('NEXT_FRUIT_HOLD');
+        if (
+            nextFruitHoldKey &&
+            this.input.keyboard.checkDown(nextFruitHoldKey, 1000)
+        ) {
+            if (!this.heldNextFruit) {
+                this.heldNextFruit = this.nextFruit;
+            } else {
+                this.heldNextFruit = null;
+            }
+            this.events.emit(
+                'debug',
+                'heldNextFruit',
+                this.heldNextFruit ? this.heldNextFruit.toString() : 'None'
+            );
+        }
+
+        const mergeToggleKey = this.keys.get('MERGE_TOGGLE');
+        if (
+            mergeToggleKey &&
+            this.input.keyboard.checkDown(mergeToggleKey, 1000)
+        ) {
+            this.mergeDisabled = !this.mergeDisabled;
+            this.events.emit('debug', 'mergeDisabled', this.mergeDisabled);
+        }
+
+        const removeAllFruitKey = this.keys.get('REMOVE_ALL_FRUIT');
+        if (
+            removeAllFruitKey &&
+            this.input.keyboard.checkDown(removeAllFruitKey, 1000)
+        ) {
+            this.fruits.clear(true, true);
         }
 
         if (this.controls === 'move') {
@@ -328,7 +412,7 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    pulsateImage(pulsatingImage) {
+    pulsateImage(pulsatingImage, durationMS) {
         // If a pulsating effect is active currently, then do not make a new one until it finishes
         if (this.barTween && !this.barTween.isFinished()) {
             return;
@@ -338,7 +422,7 @@ export class MainScene extends Phaser.Scene {
         this.barTween = this.tweens.add({
             targets: pulsatingImage,
             alpha: 1,
-            duration: 500, // Total duration of the pulsating effect in milliseconds
+            duration: durationMS, // Total duration of the pulsating effect in milliseconds
             yoyo: true, // Yoyo makes the tween play back and forth
             repeat: 1, // Repeat only once
             onComplete: () => {

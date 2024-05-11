@@ -20,6 +20,8 @@ export class DebugScene extends Phaser.Scene {
         this.debugManager.addKey('moveLeftHeld');
         this.debugManager.addKey('moveRightHeld');
         this.debugManager.addKey('heldDelta');
+        this.debugManager.addKey('mergeDisabled');
+        this.debugManager.addKey('heldNextFruit');
         game.events.on('debug', (key, value) => {
             this.debugManager.setText(key, value);
         });
