@@ -9,7 +9,6 @@ export class HUDScene extends Phaser.Scene {
     private highscoreText: Phaser.GameObjects.Text;
     private score: number;
     private highscore: number = 0;
-    private displayScore: number;
 
     private gameOverText: Phaser.GameObjects.Text;
     private beatHighscoreText: Phaser.GameObjects.Text;
@@ -46,7 +45,6 @@ export class HUDScene extends Phaser.Scene {
         }
 
         this.score = 0;
-        this.displayScore = 0;
 
         this.mainScene = this.scene.get('MainScene');
         this.mainScene.events.on('updateScore', this.updateScore.bind(this));
@@ -176,25 +174,15 @@ export class HUDScene extends Phaser.Scene {
 
     updateScore(): void {
         this.score = this.registry.get('score');
+        this.scoreText.setText(this.score.toString());
+        if (this.registry.get('beatHighscore')) {
+            this.highscoreText.setText(this.score.toString());
+        }
     }
 
-    update(time: number, delta: number): void {
-        if (this.displayScore < this.score / 2) {
-            this.displayScore = Math.ceil(this.score / 2);
-        } else if (this.displayScore < this.score) {
-            this.displayScore =
-                this.score - this.displayScore === 1
-                    ? this.displayScore + 1
-                    : this.displayScore + 2;
-        }
-        this.scoreText.setText(this.displayScore.toString());
-        if (this.registry.get('beatHighscore')) {
-            this.highscoreText.setText(this.displayScore.toString());
-        }
-    }
+    update(time: number, delta: number): void {}
 
     gameOver(): void {
-        this.displayScore = this.score;
         this.gameOverText.setVisible(true);
         if (this.registry.get('beatHighscore')) {
             this.beatHighscoreText.setVisible(true);
