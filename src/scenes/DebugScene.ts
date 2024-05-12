@@ -1,7 +1,11 @@
-import { DebugManager } from '../managers/DebugManager';
-
 export class DebugScene extends Phaser.Scene {
-    private debugManager: DebugManager;
+    private isVisible: boolean;
+    private debugTextGroup: Phaser.GameObjects.Group;
+    private debugTexts: {};
+    private y: number;
+    private back: Phaser.GameObjects.Graphics;
+    private debugControlsText: Phaser.GameObjects.Text;
+    private debugControlsTextBack: Phaser.GameObjects.Graphics;
 
     constructor() {
         super({
@@ -10,27 +14,96 @@ export class DebugScene extends Phaser.Scene {
     }
 
     create(): void {
-        var game: Phaser.Scene = this.scene.get('MainScene');
-        this.debugManager = new DebugManager(this);
-        this.debugManager.addKey('highscore');
-        this.debugManager.addKey('xspeed');
-        this.debugManager.addKey('yspeed');
-        this.debugManager.addKey('x');
-        this.debugManager.addKey('y');
-        this.debugManager.addKey('moveLeftHeld');
-        this.debugManager.addKey('moveRightHeld');
-        this.debugManager.addKey('heldDelta');
-        this.debugManager.addKey('mergeDisabled');
-        this.debugManager.addKey('heldNextFruit');
-        game.events.on('debug', (key, value) => {
-            this.debugManager.setText(key, value);
+        var mainScene: Phaser.Scene = this.scene.get('MainScene');
+        this.debugTexts = {};
+        this.y = 100;
+        this.back = this.add.graphics();
+        this.back.fillStyle(0x000000, 0.5);
+        this.back.fillRect(0, 100, (game.config.width as number) / 2, 100);
+        this.debugTextGroup = this.add.group();
+        this.addKey('highscore');
+        this.addKey('xspeed');
+        this.addKey('yspeed');
+        this.addKey('x');
+        this.addKey('y');
+        this.addKey('moveLeftHeld');
+        this.addKey('moveRightHeld');
+        this.addKey('heldDelta');
+        this.addKey('mergeDisabled');
+        this.addKey('heldNextFruit');
+        this.debugControlsTextBack = this.add.graphics();
+        this.debugControlsTextBack.fillStyle(0x000000, 0.5);
+        this.debugControlsTextBack.fillRect(
+            100,
+            200,
+            (game.config.width as number) / 1.5,
+            100
+        );
+        this.debugControlsText = this.add.text(
+            100,
+            200,
+            [
+                'R - Remove all fruit from scene',
+                'F - Change next fruit',
+                'G - Freeze next fruit',
+                'M - Toggle merging on/off',
+                'D - Toggle debug view',
+                'Q - Toggle debug controls view',
+            ].join('\n')
+        );
+        this.toggleControlsViewVisibility(false);
+        mainScene.events.on('debug', (key, value) => {
+            this.setText(key, value);
         });
-        game.events.on('debugToggle', () => {
-            this.debugManager.toggleVisibility();
+        mainScene.events.on('debugToggle', () => {
+            this.toggleVisibility();
+        });
+        mainScene.events.on('debugControlsViewToggle', () => {
+            this.toggleControlsViewVisibility(!this.debugControlsText.visible);
         });
         this.events.on('shutdown', () => {
-            game.events.removeAllListeners('debug');
-            game.events.removeAllListeners('debugToggle');
+            mainScene.events.removeAllListeners('debug');
+            mainScene.events.removeAllListeners('debugToggle');
         });
+        this.isVisible = true;
+    }
+
+    addKey(key: string): void {
+        this.debugTexts[key] = new Phaser.GameObjects.Text(
+            this,
+            0,
+            this.y,
+            '',
+            {}
+        );
+        this.debugTextGroup.add(this.debugTexts[key], true);
+        // TODO: Allow caller to set initial values
+        this.setText(key, 'None');
+        this.debugTexts[key].setScrollFactor(0);
+        this.y += 32;
+        this.back.clear();
+        this.back.fillStyle(0x000000, 0.5);
+        this.back.fillRect(
+            0,
+            100,
+            (game.config.width as number) / 2,
+            this.y - 100
+        );
+    }
+
+    setText(key: string, text: string): void {
+        this.debugTexts[key].setText(key + ': ' + text);
+    }
+
+    toggleVisibility(): void {
+        this.isVisible = !this.isVisible;
+        this.debugTextGroup.toggleVisible();
+        this.back.setVisible(this.isVisible);
+        this.toggleControlsViewVisibility(this.isVisible);
+    }
+
+    toggleControlsViewVisibility(visible: boolean): void {
+        this.debugControlsText.setVisible(visible);
+        this.debugControlsTextBack.setVisible(visible);
     }
 }

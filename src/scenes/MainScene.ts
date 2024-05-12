@@ -57,6 +57,10 @@ export class MainScene extends Phaser.Scene {
             this.keys.set('NEXT_FRUIT_HOLD', this.input.keyboard.addKey('G'));
             this.keys.set('MERGE_TOGGLE', this.input.keyboard.addKey('M'));
             this.keys.set('REMOVE_ALL_FRUIT', this.input.keyboard.addKey('R'));
+            this.keys.set(
+                'TOGGLE_DEBUG_CONTROLS',
+                this.input.keyboard.addKey('Q')
+            );
         }
         // TODO: Could the themes not selected by user be loaded later?
         // TODO: Iterate all themes and load them
@@ -405,6 +409,14 @@ export class MainScene extends Phaser.Scene {
             this.input.keyboard.checkDown(removeAllFruitKey, 1000)
         ) {
             this.fruits.clear(true, true);
+        }
+
+        const toggleControlsViewKey = this.keys.get('TOGGLE_DEBUG_CONTROLS');
+        if (
+            toggleControlsViewKey &&
+            this.input.keyboard.checkDown(toggleControlsViewKey, 1000)
+        ) {
+            this.events.emit('debugControlsViewToggle');
         }
 
         if (this.controls === 'move') {
