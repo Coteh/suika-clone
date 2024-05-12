@@ -148,11 +148,13 @@ export class MainScene extends Phaser.Scene {
             this.events.emit('tap');
             // Place fruit
             if (this.canTouch) {
+                const debugGraphics = this.add.graphics();
                 const fruit = new Fruit(
                     this.matter.world,
                     posX,
                     20,
-                    this.nextFruit
+                    this.nextFruit,
+                    debugGraphics
                 );
                 this.fruits.add(fruit, true);
                 this.touchCooldown = 500;
@@ -206,11 +208,13 @@ export class MainScene extends Phaser.Scene {
 
                         // Merge fruits if they're the same
                         if (fruit1.fruitType == fruit2.fruitType) {
+                            const debugGraphics = this.add.graphics();
                             const fruit = new Fruit(
                                 this.matter.world,
                                 fruit1.x,
                                 fruit1.y - 50,
-                                fruit1.fruitType + 1
+                                fruit1.fruitType + 1,
+                                debugGraphics
                             );
                             this.fruits.add(fruit, true);
                             this.fruits.remove(fruit1, true, true);

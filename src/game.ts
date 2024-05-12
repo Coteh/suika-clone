@@ -60,7 +60,6 @@ window.onload = () => {
         physics: {
             default: 'matter',
             matter: {
-                debug: !!process.env.IS_DEBUG,
                 enableSleeping: true,
             },
         },

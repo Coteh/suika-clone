@@ -19,8 +19,18 @@ export class DebugScene extends Phaser.Scene {
         this.y = 100;
         this.back = this.add.graphics();
         this.back.fillStyle(0x000000, 0.5);
-        this.back.fillRect(0, 100, (game.config.width as number) / 2, 100);
+        this.back.fillRect(0, 100, (game.config.width as number) / 1.5, 100);
         this.debugTextGroup = this.add.group();
+        const instructionsText = new Phaser.GameObjects.Text(
+            this,
+            0,
+            this.y,
+            '',
+            {}
+        );
+        instructionsText.setText('Press Q for controls info');
+        this.y += 32;
+        this.debugTextGroup.add(instructionsText, true);
         this.addKey('highscore');
         this.addKey('xspeed');
         this.addKey('yspeed');
@@ -66,6 +76,7 @@ export class DebugScene extends Phaser.Scene {
             mainScene.events.removeAllListeners('debugToggle');
         });
         this.isVisible = true;
+        this.registry.set('debugVisible', true);
     }
 
     addKey(key: string): void {
@@ -86,7 +97,7 @@ export class DebugScene extends Phaser.Scene {
         this.back.fillRect(
             0,
             100,
-            (game.config.width as number) / 2,
+            (game.config.width as number) / 1.5,
             this.y - 100
         );
     }
@@ -100,6 +111,7 @@ export class DebugScene extends Phaser.Scene {
         this.debugTextGroup.toggleVisible();
         this.back.setVisible(this.isVisible);
         this.toggleControlsViewVisibility(this.isVisible);
+        this.registry.set('debugVisible', this.isVisible);
     }
 
     toggleControlsViewVisibility(visible: boolean): void {

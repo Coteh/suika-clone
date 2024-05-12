@@ -1,3 +1,5 @@
+import { BodyType } from 'matter';
+
 export enum FruitType {
     Apple = 0,
     Pear = 1,
@@ -43,11 +45,14 @@ export class Fruit extends Phaser.Physics.Matter.Image {
 
     lifetime: number;
 
+    private debugGraphics: Phaser.GameObjects.Graphics;
+
     constructor(
         world: Phaser.Physics.Matter.World,
         x: number,
         y: number,
-        type: FruitType
+        type: FruitType,
+        debugGraphics: Phaser.GameObjects.Graphics
     ) {
         let sprite = fruitTypeToTextureString(type);
         super(world, x, y, sprite);
@@ -63,9 +68,29 @@ export class Fruit extends Phaser.Physics.Matter.Image {
             this.setCircle(this.displayWidth / 2);
         }
         this.lifetime = 0;
+        this.debugGraphics = debugGraphics;
     }
 
     public update(time: number, delta: number): void {
         this.lifetime += delta;
+
+        this.debugGraphics.clear();
+        if (this.scene.registry.get('debugVisible')) {
+            this.world.renderBody(
+                this.body as BodyType,
+                this.debugGraphics,
+                true,
+                0x28de19,
+                1,
+                1,
+                0,
+                0
+            );
+        }
+    }
+
+    public destroy(fromScene?: boolean): void {
+        super.destroy(fromScene);
+        this.debugGraphics.destroy(fromScene);
     }
 }
