@@ -59,7 +59,7 @@ export class HUDScene extends Phaser.Scene {
         );
         this.mainScene.events.on('toggleHUD', () => {
             const isVisible = this.scene.isVisible('HUDScene');
-            this.scene.setVisible(!isVisible, "HUDScene");
+            this.scene.setVisible(!isVisible, 'HUDScene');
         });
 
         this.game.events.on('controlsChange', this.onControlsChange.bind(this));
@@ -191,7 +191,6 @@ export class HUDScene extends Phaser.Scene {
         if (this.registry.get('beatHighscore')) {
             this.beatHighscoreText.setVisible(true);
         }
-        this.registry.set('beatHighscore', false);
         if (this.registry.get('highscore')) {
             this.highscore = this.registry.get('highscore');
             this.highscoreText.setText(this.highscore.toString());

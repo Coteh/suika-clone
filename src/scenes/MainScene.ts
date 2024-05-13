@@ -5,6 +5,7 @@ import {
 } from '../gameobjects/Fruit';
 import { Player } from '../gameobjects/Player';
 import { GameManager } from '../managers/GameManager';
+import { saveGameState } from '../storage';
 import { GameControl, GameTheme } from '../types';
 
 export class MainScene extends Phaser.Scene {
@@ -102,7 +103,7 @@ export class MainScene extends Phaser.Scene {
             this.gameManager = new GameManager(this);
             this.registry.set('gameManager', this.gameManager);
         }
-        this.gameManager.init();
+        this.gameManager.init(gameState.highScore);
         this.events.on('updateScore', () => {
             this.gameManager.updateHighScore();
         });
@@ -114,10 +115,16 @@ export class MainScene extends Phaser.Scene {
             this.events.emit('updateScore');
             this.highestFruit = 0;
             this.setNextFruit(this.heldNextFruit);
+            if (this.registry.get('beatHighscore')) {
+                console.log('saving new high score to storage...');
+                gameState.highScore = this.gameManager.getHighScore();
+                saveGameState(gameState);
+            }
         });
         this.events.on('gameStarted', () => {
             this.gameManager.setGameOver(false);
             this.gameManager.setDidWin(false);
+            this.registry.set('beatHighscore', false);
         });
         this.events.on('moveLeft', () => {
             this.player.moveLeft();
@@ -297,6 +304,7 @@ export class MainScene extends Phaser.Scene {
     onDebugSceneCreate(): void {
         this.events.emit('debug', 'moveLeftHeld', false);
         this.events.emit('debug', 'moveRightHeld', false);
+        this.events.emit('debug', 'highscore', this.gameManager.getHighScore());
     }
 
     setNextFruit(nextFruit?: FruitType): void {
@@ -426,7 +434,10 @@ export class MainScene extends Phaser.Scene {
         }
 
         const toggleOutlinesKey = this.keys.get('TOGGLE_OUTLINES');
-        if (toggleOutlinesKey && this.input.keyboard.checkDown(toggleOutlinesKey, 1000)) {
+        if (
+            toggleOutlinesKey &&
+            this.input.keyboard.checkDown(toggleOutlinesKey, 1000)
+        ) {
             this.events.emit('debugOutlinesToggle');
         }
 

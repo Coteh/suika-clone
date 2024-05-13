@@ -9,10 +9,11 @@ import {
 } from './page';
 import {
     GameOptions,
-    hasPlayedBefore,
+    GameState,
     loadGameOptions,
+    loadGameState,
     saveGameOptions,
-    setPlayedBefore,
+    saveGameState,
 } from './storage';
 
 const THEME_SETTING_NAME = 'theme-switch';
@@ -24,9 +25,11 @@ declare global {
     var game: SuikaCloneGame;
     var MobileDetect: any;
     var gameOptions: GameOptions;
+    var gameState: GameState;
 }
 
 global.gameOptions = loadGameOptions();
+global.gameState = loadGameState();
 
 class SuikaCloneGame extends Phaser.Game {
     constructor(config: Phaser.Types.Core.GameConfig) {
@@ -201,7 +204,8 @@ if (landscapeQuery.addEventListener) {
 
 checkForOrientation(landscapeQuery);
 
-if (!hasPlayedBefore()) {
+if (!gameState.hasPlayedBefore) {
     renderDialog(createDialogContentFromTemplate('#how-to-play'), true);
-    setPlayedBefore();
+    gameState.hasPlayedBefore = true;
+    saveGameState(gameState);
 }

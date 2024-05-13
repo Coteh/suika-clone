@@ -10,12 +10,17 @@ export class GameManager {
         this.scene = scene;
     }
 
-    public init() {
-        this.scene.events.emit('debug', 'highscore', this.highScore.toString());
+    public init(highscore: number) {
+        this.highScore = highscore;
         this.gameOver = false;
         this.didWin = false;
-        this.scene.registry.set('beatHighscore', this.highScore === 0);
+        this.scene.registry.set('beatHighscore', false);
         this.scene.registry.set('score', 0);
+        this.scene.registry.set('highscore', this.highScore);
+    }
+
+    public getHighScore(): number {
+        return this.highScore;
     }
 
     public updateHighScore(): void {
