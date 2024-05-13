@@ -61,6 +61,8 @@ export class MainScene extends Phaser.Scene {
                 'TOGGLE_DEBUG_CONTROLS',
                 this.input.keyboard.addKey('Q')
             );
+            this.keys.set('TOGGLE_OUTLINES', this.input.keyboard.addKey('W'));
+            this.keys.set('TOGGLE_HUD', this.input.keyboard.addKey('E'));
         }
         // TODO: Could the themes not selected by user be loaded later?
         // TODO: Iterate all themes and load them
@@ -421,6 +423,16 @@ export class MainScene extends Phaser.Scene {
             this.input.keyboard.checkDown(toggleControlsViewKey, 1000)
         ) {
             this.events.emit('debugControlsViewToggle');
+        }
+
+        const toggleOutlinesKey = this.keys.get('TOGGLE_OUTLINES');
+        if (toggleOutlinesKey && this.input.keyboard.checkDown(toggleOutlinesKey, 1000)) {
+            this.events.emit('debugOutlinesToggle');
+        }
+
+        const toggleHUDKey = this.keys.get('TOGGLE_HUD');
+        if (toggleHUDKey && this.input.keyboard.checkDown(toggleHUDKey, 1000)) {
+            this.events.emit('toggleHUD');
         }
 
         if (this.controls === 'move') {

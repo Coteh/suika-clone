@@ -7,6 +7,9 @@ export class DebugScene extends Phaser.Scene {
     private debugControlsText: Phaser.GameObjects.Text;
     private debugControlsTextBack: Phaser.GameObjects.Graphics;
 
+    private lastControlsInfoVisibility: boolean;
+    private lastOutlinesVisibility: boolean;
+
     constructor() {
         super({
             key: 'DebugScene',
@@ -41,25 +44,28 @@ export class DebugScene extends Phaser.Scene {
         this.addKey('heldDelta');
         this.addKey('mergeDisabled');
         this.addKey('heldNextFruit');
+        const controls = [
+            'R - Remove all fruit from scene',
+            'F - Change next fruit',
+            'G - Freeze next fruit',
+            'M - Toggle merging on/off',
+            'D - Toggle debug view',
+            'Q - Toggle debug controls view',
+            'W - Toggle debug outlines',
+            'E - Toggle HUD',
+        ];
         this.debugControlsTextBack = this.add.graphics();
         this.debugControlsTextBack.fillStyle(0x000000, 0.5);
         this.debugControlsTextBack.fillRect(
             100,
             200,
             (game.config.width as number) / 1.5,
-            100
+            controls.length * 16,
         );
         this.debugControlsText = this.add.text(
             100,
             200,
-            [
-                'R - Remove all fruit from scene',
-                'F - Change next fruit',
-                'G - Freeze next fruit',
-                'M - Toggle merging on/off',
-                'D - Toggle debug view',
-                'Q - Toggle debug controls view',
-            ].join('\n')
+            controls.join('\n'),
         );
         this.toggleControlsViewVisibility(false);
         mainScene.events.on('debug', (key, value) => {
@@ -69,7 +75,14 @@ export class DebugScene extends Phaser.Scene {
             this.toggleVisibility();
         });
         mainScene.events.on('debugControlsViewToggle', () => {
-            this.toggleControlsViewVisibility(!this.debugControlsText.visible);
+            const newVisibility = !this.debugControlsText.visible;
+            this.toggleControlsViewVisibility(newVisibility);
+            this.lastControlsInfoVisibility = newVisibility;
+        });
+        mainScene.events.on('debugOutlinesToggle', () => {
+            const isDebugVisibleSet = this.registry.get('debugVisible');
+            this.toggleOutlinesVisibility(!isDebugVisibleSet);
+            this.lastOutlinesVisibility = !isDebugVisibleSet;
         });
         this.events.on('shutdown', () => {
             mainScene.events.removeAllListeners('debug');
@@ -77,6 +90,8 @@ export class DebugScene extends Phaser.Scene {
         });
         this.isVisible = true;
         this.registry.set('debugVisible', true);
+        this.lastControlsInfoVisibility = false;
+        this.lastOutlinesVisibility = true;
     }
 
     addKey(key: string): void {
@@ -110,12 +125,22 @@ export class DebugScene extends Phaser.Scene {
         this.isVisible = !this.isVisible;
         this.debugTextGroup.toggleVisible();
         this.back.setVisible(this.isVisible);
-        this.toggleControlsViewVisibility(this.isVisible);
-        this.registry.set('debugVisible', this.isVisible);
+        if (!this.isVisible) {
+            this.toggleControlsViewVisibility(false);
+            this.toggleOutlinesVisibility(false);
+        } else {
+            this.toggleControlsViewVisibility(this.lastControlsInfoVisibility);
+            this.toggleOutlinesVisibility(this.lastOutlinesVisibility);
+        }
     }
 
     toggleControlsViewVisibility(visible: boolean): void {
         this.debugControlsText.setVisible(visible);
         this.debugControlsTextBack.setVisible(visible);
+    }
+
+    toggleOutlinesVisibility(visible: boolean): void {
+        // 'debugVisible' in registry controls whether the debug outlines are drawn or not, see Fruit class
+        this.registry.set('debugVisible', visible);
     }
 }

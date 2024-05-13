@@ -57,6 +57,10 @@ export class HUDScene extends Phaser.Scene {
             'nextFruit',
             this.setNextFruitSprite.bind(this)
         );
+        this.mainScene.events.on('toggleHUD', () => {
+            const isVisible = this.scene.isVisible('HUDScene');
+            this.scene.setVisible(!isVisible, "HUDScene");
+        });
 
         this.game.events.on('controlsChange', this.onControlsChange.bind(this));
 
