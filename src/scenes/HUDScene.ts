@@ -114,10 +114,14 @@ export class HUDScene extends Phaser.Scene {
         this.leftArrow.setOrigin(0.5);
         this.leftArrow.setScale(0.1, 0.1);
         this.leftArrow.x = this.leftArrow.displayWidth / 2;
-        this.leftArrow.setInteractive().on('pointerdown', () => {
+        this.leftArrow.setInteractive();
+        this.leftArrow.on('pointerdown', () => {
             this.mainScene.events.emit('moveLeftStart');
         });
-        this.leftArrow.setInteractive().on('pointerup', () => {
+        this.leftArrow.on('pointerup', () => {
+            this.mainScene.events.emit('moveLeftStop');
+        });
+        this.leftArrow.on('pointerout', () => {
             this.mainScene.events.emit('moveLeftStop');
         });
 
@@ -130,10 +134,14 @@ export class HUDScene extends Phaser.Scene {
         this.rightArrow.setScale(0.1, 0.1);
         this.rightArrow.x =
             this.cameras.main.width - this.rightArrow.displayWidth / 2;
-        this.rightArrow.setInteractive().on('pointerdown', () => {
+        this.rightArrow.setInteractive();
+        this.rightArrow.on('pointerdown', () => {
             this.mainScene.events.emit('moveRightStart');
         });
-        this.rightArrow.setInteractive().on('pointerup', () => {
+        this.rightArrow.on('pointerup', () => {
+            this.mainScene.events.emit('moveRightStop');
+        });
+        this.rightArrow.on('pointerout', () => {
             this.mainScene.events.emit('moveRightStop');
         });
 
